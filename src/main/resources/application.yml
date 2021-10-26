@@ -1,0 +1,48 @@
+server:
+  port: 8091
+spring:
+  application:
+    name: Zpain-gateway
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: zpain2
+          uri: lb://zpain2
+          predicates:
+            - Path=/zpain/**
+          filters:
+            - StripPrefix=1
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+          filters:
+          - StripPrefix=1
+        - id: Zpain-auth
+          uri: lb://Zpain-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+    nacos:
+      config:
+        group: zpain-gateway
+        namespace: ${spring.cloud.nacos.discovery.namespace}
+        server-addr: ${spring.cloud.nacos.discovery.server-addr}
+      discovery:
+        namespace: 164265e8-9bd8-424d-a687-94cca4083a21
+        server-addr: localhost:8848
+        group: zpain
+jwt:
+  expiration: 600000
+  header: Authorization
+  secret: mySecret
+  tokenHead: 'Bearer '
